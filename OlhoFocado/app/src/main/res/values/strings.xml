@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Olho Focado</string>
+    <string name="accessibility_service_description">Guardião Nativo Olho Focado: bloqueia guias anônimas, conteúdos adultos e protege as configurações do sistema enquanto o timer estiver ativo, sem depender de Conta Google.</string>
+</resources>

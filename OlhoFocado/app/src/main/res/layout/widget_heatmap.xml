@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_root_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#FAF6EE"
+    android:padding="6dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingBottom="5dp">
+
+        <TextView
+            android:id="@+id/widget_btn_pratica"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="#1E4E8C"
+            android:text="🛡 Prática"
+            android:textColor="#FFFFFF"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            android:paddingLeft="9dp"
+            android:paddingRight="9dp"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"
+            android:gravity="center" />
+
+        <TextView
+            android:id="@+id/widget_btn_hoje"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="6dp"
+            android:background="#F3EDE0"
+            android:text="Hoje --/-- · ○ Pendente"
+            android:textColor="#231F1A"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            android:singleLine="true"
+            android:ellipsize="end"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"
+            android:gravity="center" />
+
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/widget_heatmap_image"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:scaleType="fitCenter"
+        android:contentDescription="Mapa de Calor de Dias Limpos" />
+
+</LinearLayout>
