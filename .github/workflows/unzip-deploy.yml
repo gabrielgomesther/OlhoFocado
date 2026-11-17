@@ -1,0 +1,33 @@
+name: Descompactar e Publicar
+
+on:
+  push:
+    branches: [ main ]
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  unzip-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Baixar código do repositório
+        uses: actions/checkout@v4
+
+      - name: Descompactar arquivos .zip e remover o zip original
+        run: |
+          for z in *.zip; do
+            if [ -f "$z" ]; then
+              unzip -o "$z" -d .
+              rm "$z"
+            fi
+          done
+
+      - name: Salvar arquivos extraídos no repositório
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add .
+          git diff --staged --quiet || (git commit -m "Arquivos extraídos do ZIP automaticamente" && git push)
