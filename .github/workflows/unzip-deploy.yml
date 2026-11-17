@@ -1,33 +1,66 @@
-name: Descompactar e Publicar
+name: Organizar Site e Publicar APK
 
 on:
   push:
     branches: [ main ]
+  workflow_dispatch:
 
 permissions:
   contents: write
-  pages: write
-  id-token: write
 
 jobs:
-  unzip-and-push:
+  process-files:
     runs-on: ubuntu-latest
     steps:
       - name: Baixar código do repositório
         uses: actions/checkout@v4
 
-      - name: Descompactar arquivos .zip e remover o zip original
+      - name: Extrair ZIPs, nivelar subpastas e capturar APK
+        id: organize
         run: |
+          mkdir -p /tmp/release_assets
+
+          # 1. Se subir algum ZIP, extrai ignorando workflows
           for z in *.zip; do
             if [ -f "$z" ]; then
-              unzip -o "$z" -d .
-              rm "$z"
+              cp "$z" /tmp/release_assets/
+              unzip -o "$z" -x ".github/*" -d .
+              git rm -f "$z" || rm -f "$z"
             fi
           done
 
-      - name: Salvar arquivos extraídos no repositório
+          # 2. Se os arquivos vieram presos dentro de uma subpasta (como OlhoFocado/), move para a raiz
+          if [ -d "OlhoFocado" ]; then
+            mv OlhoFocado/* . 2>/dev/null || true
+            rmdir OlhoFocado 2>/dev/null || true
+          fi
+
+          # 3. Captura qualquer arquivo .apk, envia para Releases e limpa da raiz
+          find . -maxdepth 2 -name "*.apk" | while read apk_file; do
+            cp "$apk_file" /tmp/release_assets/
+            git rm -f "$apk_file" || rm -f "$apk_file"
+          done
+
+          # 4. Confirma se há arquivos para publicar na aba Releases
+          if [ -n "$(ls -A /tmp/release_assets 2>/dev/null)" ]; then
+            echo "has_assets=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_assets=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Salvar repositório limpo e nivelado
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add .
-          git diff --staged --quiet || (git commit -m "Arquivos extraídos do ZIP automaticamente" && git push)
+          git add -A
+          git diff --staged --quiet || (git commit -m "Nivelar arquivos na raiz e organizar APK" && git push)
+
+      - name: Publicar APK na aba Releases
+        if: steps.organize.outputs.has_assets == 'true'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: latest
+          name: "OlhoFocado - Aplicativo Android (APK)"
+          body: "Download direto do aplicativo Android (.apk) do projeto OlhoFocado pronto para instalação."
+          files: /tmp/release_assets/*
+          prerelease: false
